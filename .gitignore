@@ -1,5 +1,6 @@
 data/raw/
-data/derived/*.parquet
+data/derived/pitches.parquet
 *.hyper
 *.twbx
 __pycache__/
+.DS_Store
