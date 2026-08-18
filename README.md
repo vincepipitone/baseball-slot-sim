@@ -48,3 +48,17 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   axis, active spin, SSW deviation. Indexed 100/10 per season. TRUE-FORWARD test (train ≤2023, predict next-season RV/100 for
   2024–25 pitcher-seasons, n=753): FG Stuff+ .371 | A .302 | B .363 | FG Pitching+ .398. Physics features ≈ +.06 forward r;
   first pass at parity with FG. B–FG corr .60; Y2Y .75 (FG .78).
+
+## Update (2026-08-18, night): slot lever — negative results recorded
+- `src/fit_transfer.py` (transfer_fits.csv): on 3,139 |Δslot|≥3° pitcher-family pairs, grouped-OOS — release height 0.04 ft/°
+  (r² .62–.75); measured spin axis rotates ~0.9°/° on FF/SI/CH (r² .53–.70), not on SL/FC; IVB FF +0.18"/°, SI +0.27"/°,
+  CH +0.20"/° (r² .30/.53/.26); HB FF −0.10"/° (r² .35); breaking-ball HB, velo, active spin: no slot dependence (r² ≈ 0).
+- `src/simulate_slot.py`: rotate a pitcher's own pitches by the slopes and rescore with the own RV model → mean best-case gain
+  0.5, and r ≈ 0 vs realized ΔStuff on the 349 changers. `src/test_shape_prediction.py`: slopes/precedent cut fastball IVB
+  error to ~0.8–1.0" but nothing beats "no change" on breaking balls; Palmquist's 2026 sinker (4.7" IVB) was a NEW pitch,
+  not a transformed one — precedent at 16° for LHP/eff .91 predicts 4.7"/18.1"/Stf+ 98 vs his 4.7"/16.5"/97.
+- `src/precedent_at_slot.py`: precedent-arsenal-at-slot lever → r = −.07 vs realized ΔStuff+ on changers; the "unrealized
+  pitch" distance (flags Palmquist 2025 SI at 11") has r = .01 with next-season ΔStuff+ over 2,155 pitcher-seasons.
+- Verdict: slot changes average ~0 either direction and neither rotation nor precedent-at-slot identifies winners ex ante.
+  What is predictable is downstream of the shape (Δ r ≈ .6 given the realized arsenal). The slot lever is therefore a
+  repertoire question (addition classifier + precedent quality), not a geometry question.
