@@ -17,21 +17,27 @@ tr=fb[['pitcher','player_name','p_throws','game_year','arm_angle','VAA_AA_pt','r
     columns={'VAA_AA_pt':'fb_havaa','release_speed':'fb_velo','axis_minus_slot':'suppro'})
 tot=t.groupby(['pitcher','game_year']).n.sum().rename('n_tot').reset_index()
 tr=tr.merge(tot,on=['pitcher','game_year']); tr=tr[(tr.n_tot>=200)&tr.arm_angle.notna()].reset_index(drop=True)
+sp=pd.read_parquet('data/derived/suppro.parquet')[['pitcher','game_year','eff4','axis_res','si_dev','suppro_class']]
+tr=tr.merge(sp,on=['pitcher','game_year'],how='left'); tr['suppro_class']=tr.suppro_class.fillna('unknown')
+GROUP={'pronator':'P','lean_pronator':'P','supinator':'S','lean_supinator':'S','hybrid':'H','unknown':'H'}
+tr['grp']=tr.suppro_class.map(GROUP)
 U=t.pivot_table(index=['pitcher','game_year'],columns='fg_type',values='usage',aggfunc='first').reindex(columns=FAM).fillna(0)
 S=t.pivot_table(index=['pitcher','game_year'],columns='fg_type',values='stf',aggfunc='first').reindex(columns=FAM)
 U=U.reindex(pd.MultiIndex.from_frame(tr[['pitcher','game_year']])).fillna(0).values
 S=S.reindex(pd.MultiIndex.from_frame(tr[['pitcher','game_year']])).values
-FEATS=['arm_angle','fb_havaa','release_pos_z','fb_velo','bauer_fb','suppro','release_extension']
+FEATS=['arm_angle','fb_havaa','release_pos_z','fb_velo','bauer_fb','eff4','axis_res','release_extension']
 X=tr[FEATS].fillna(tr[FEATS].median()); Z=((X-X.mean())/X.std()).values
 Z[:,0]*=1.5  # weight slot a bit more
 prec=np.zeros((len(tr),len(FAM))); pstf=np.full((len(tr),len(FAM)),np.nan)
 for hand in ['R','L']:
     idx=np.where(tr.p_throws.values==hand)[0]
-    nn=NearestNeighbors(n_neighbors=K+1).fit(Z[idx])
+    nn=NearestNeighbors(n_neighbors=min(3*K,len(idx))).fit(Z[idx])
     d,nb=nn.kneighbors(Z[idx])
     for i,row in enumerate(idx):
         # exclude self AND same pitcher other seasons (leakage)
-        cand=[idx[j] for j in nb[i] if tr.pitcher.values[idx[j]]!=tr.pitcher.values[row]][:K]
+        # exclude self/same pitcher; require compatible sup/pro group (hybrids match anyone)
+        g0=tr.grp.values[row]
+        cand=[idx[j] for j in nb[i] if tr.pitcher.values[idx[j]]!=tr.pitcher.values[row] and (g0=='H' or tr.grp.values[idx[j]] in (g0,'H'))][:K]
         uu=U[cand]; ss=S[cand]
         thr=(uu>=0.10)
         prec[row]=thr.mean(0)
@@ -79,6 +85,6 @@ q=m.apply(lambda r:r[f"pstf_{r.fg_type}"],axis=1); ok=q.notna()&m.stf_next.notna
 print(f"added-pitch quality: r(precedent Stf+, realized Stf+) = {np.corrcoef(q[ok],m.stf_next[ok])[0,1]:.3f} (n={ok.sum()})")
 for nm in ['Yesavage','Palmquist']:
     r=out[out.player_name.str.contains(nm)].sort_values('game_year').iloc[-1]
-    print(f"\n{r.player_name} {int(r.game_year)}: slot {r.arm_angle:.1f}, HAVAA {r.fb_havaa:+.2f}, Stuff+ {r.sp_stuff:.0f}, optionality {r.optionality:.1f}, reachable roles {int(r.reachable_families)}, best add {r.best_add or '-'}, precedent pool n={int(r.n_precedent_pool)}")
+    print(f"\n{r.player_name} {int(r.game_year)}: slot {r.arm_angle:.1f}, HAVAA {r.fb_havaa:+.2f}, eff4 {r.eff4:.2f}, class {r.suppro_class}, Stuff+ {r.sp_stuff:.0f}, optionality {r.optionality:.1f}, reachable roles {int(r.reachable_families)}, best add {r.best_add or '-'}, precedent pool n={int(r.n_precedent_pool)}")
     print('  '+' | '.join(f"{f}: use {r[f'use_{f}']*100:.0f}% prec {r[f'prec_{f}']:.2f} pStf {r[f'pstf_{f}']:.0f}" for f in FAM))
 print('\noptionality by slot quintile:'); out['q']=pd.qcut(out.arm_angle,5); print(out.groupby('q',observed=True)[['optionality','reachable_families','n_precedent_pool']].mean().round(2))

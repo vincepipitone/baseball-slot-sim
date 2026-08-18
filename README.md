@@ -34,3 +34,17 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   Yesavage 2026: precedent pool n=16, optionality 1.1, only lever a 12-6 curve (comps 111 vs his 108) → the
   "no stuff lever, north-south only" check passes from the data. Palmquist 2026: optionality 0 (now optimal).
 - Scripts: build_corpora.py, precedent.py, test_delta.py.
+
+## Update (2026-08-18, later): sup/pro classifier, addition classifier, own run-value Stuff model
+- `docs/RESEARCH-supination-pronation.md` — sourced operational definitions (Rosen/FanGraphs: 4S spin-based active spin ≥95% pronator,
+  <90% supinator; Pitcher List hybrid 80–89% w/ high raw spin; Tread sweeper tell; SSW deviation; slot-relative axis residual).
+- `src/pull_savant_spin.py` → `savant_spin.csv` (Savant spin-direction leaderboard: active spin, measured vs inferred axis, deviation;
+  20.5k pitcher-season-pitch rows 2020–26). `src/suppro.py` → `suppro.parquet`: eff4 Y2Y r² .86; class persistence 72%;
+  Hancock 96%/27° pronator → 82%/11° supinator reproduces the published story; Yesavage pronator; Palmquist lean supinator.
+- `src/fit_addition_classifier.py`: which family gets added, grouped 10-fold, OOF base rate — model top-1 .59 / top-2 .82 vs
+  base .56 / .78, log-loss 1.14 vs 1.25 (n=394). Supinator-leaning add FC/SL, pronator-leaning add SI/FS/CH.
+- `src/fit_stuff_rv.py`: OWN Stuff model — XGBoost, pitch-level, target = platoon/season-adjusted run value, all pitches pooled,
+  no pitch-type label, physical features only. A = FG-like features; B = A + arm angle, HAVAA, VRA/HRA, AzOE/AxOE, measured
+  axis, active spin, SSW deviation. Indexed 100/10 per season. TRUE-FORWARD test (train ≤2023, predict next-season RV/100 for
+  2024–25 pitcher-seasons, n=753): FG Stuff+ .371 | A .302 | B .363 | FG Pitching+ .398. Physics features ≈ +.06 forward r;
+  first pass at parity with FG. B–FG corr .60; Y2Y .75 (FG .78).

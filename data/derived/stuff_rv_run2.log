@@ -1,0 +1,33 @@
+A_fglike done
+B_plus done
+
+pitcher-seasons n>=300: 3792
+corr with FG Stuff+ (grouped-OOS ours): A 0.626  B 0.596
+
+SAME-season RV/100 (weights n):   FG 0.482 | A_oos 0.298 | B_oos 0.405
+NEXT-season RV/100 (n=2273):      FG 0.409 | A_oos 0.263 | B_oos 0.331 | A_t23 0.385 | B_t23 0.411
+NEXT-season RV/100, 2024-25 seasons only (t23 models are true forward, n=753): FG 0.371 | A_t23 0.302 | B_t23 0.363 | Pitching+ 0.398
+NEXT-season wOBA (n=2273):        FG 0.413 | A_oos 0.284 | B_oos 0.326
+Y2Y stability (n=2281): FG 0.782 | A 0.853 | B 0.750
+
+B feature importance (gain share):
+VRA                  0.084
+rx_arm               0.079
+HB_arm               0.078
+HRA                  0.076
+release_pos_z        0.070
+IVB                  0.065
+AzOE                 0.054
+release_speed        0.045
+axis_m               0.040
+AxOE                 0.037
+active_spin          0.037
+is_primary_fb        0.035
+VAA_AA_pt            0.035
+release_spin_rate    0.035
+      player_name  game_year   n  sp_stuff  stuff_A_fglike_oos  stuff_B_plus_oos  rv100
+Palmquist, Carson       2025 705      93.2                98.6              96.8   -2.3
+Palmquist, Carson       2026 313     107.3                99.8              99.4   -1.3
+   player_name  game_year    n  sp_stuff  stuff_A_fglike_oos  stuff_B_plus_oos  rv100
+Yesavage, Trey       2025  239     107.0               111.7             103.4    0.9
+Yesavage, Trey       2026 1549     107.9               110.6             100.9    0.6
