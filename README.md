@@ -107,3 +107,15 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   Palmquist #29, Dollander #18, Senzatela #20, Hancock #105. Caveat: survivorship among ranked relievers without 2026 samples.
 - Additions are now ROLE-level (CU/KC one role, CH/FS one role): no "add a curve when he throws a knuckle-curve" rows.
 - Board: `docs/targets_2026.html` (default sort = opportunity; row detail shows all four levers).
+
+## Update (2026-08-18, evening): what "pitch gap" is, and the ACTIONABLE score
+- `src/test_gap_decomp.py`: the existing-pitch gap predicts next-season Δ identically whether the pitch is shaped like comps' or not
+  (.22 vs .25), and its velo and shape halves predict identically (.233/.234) → it is shrinkage toward a hardware prior
+  (per-pitch next Stf+ ≈ .7·own + .25·comps, t=15), not a fixable-shape signal. Persistent (last-year) gap .16/pt, transient .26/pt;
+  pitches with gap≥8 two years running still average +2.3 (31% improve ≥5). Dobnak (91.7→88.4→81.4 vs comps ~100) is the
+  individual counterexample. Relabeled REGRESS-TO-COMPS; kept in Drift (valuation), excluded from Actionable.
+- ACTIONABLE = mix gain (≤20 pts usage toward better pitches; FB≥30%, cap 45%) + best reachable role-unoccupied add at comps'
+  Stf+ × 0.14 (no P(add) discount) + drop-recipe bonus 1.4 (floor lowered to 15°). Beck Way #7 (mix +8.5: 128 slider at 15%,
+  84 FF at 14%; curve 103 reachable; drop-recipe) → proj 109. As-of-2025 actionable top-40 gained +1.8 in 2026 vs −0.6 matched
+  (excess +2.4, n=27; top-80 +2.8). Hancock #38, Palmquist #56 as of 2025.
+- Board: default sort Actionable; Drift and Regress shown alongside.

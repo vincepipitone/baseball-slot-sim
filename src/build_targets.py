@@ -67,12 +67,12 @@ L['gain']=np.where(L.reach,U_ADD*np.clip(L.gain_raw,0,None),0.0); L['ev']=L.p_ad
 best=L.sort_values('gain',ascending=False).drop_duplicates('idx').set_index('idx')
 bestev=L.sort_values('ev',ascending=False).drop_duplicates('idx').set_index('idx')
 d['best_add']=best.fam; d['best_add_pstf']=best.pstf; d['best_add_prec']=best.prec; d['best_add_padd']=best.p_add; d['gain']=best.gain.fillna(0)
-nog=d.gain<=0; d.loc[nog,'best_add']='—'; d.loc[nog,['best_add_pstf','best_add_prec','best_add_padd']]=np.nan
+nog=(d.gain<=0)|d.best_add.isna(); d.loc[nog,'best_add']='—'; d.loc[nog,['best_add_pstf','best_add_prec','best_add_padd']]=np.nan
 d['ev_add']=bestev.fam; d['ev']=bestev.ev.fillna(0)
 d['n_reachable']=L[L.reach].groupby('idx').size().reindex(d.index).fillna(0)
 d['sum_ev']=L.groupby('idx').ev.sum().reindex(d.index).fillna(0)
 # ---- slot flag
-d['drop_recipe']=((d.ivb_rel<0)&(d.eff4>=0.93)&(d.arm_angle>=25)).fillna(False).astype(int)
+d['drop_recipe']=((d.ivb_rel<0)&(d.eff4>=0.93)&(d.arm_angle>=15)).fillna(False).astype(int)
 # ---- projection & value
 d['loc_proj']=100+0.5*(d.sp_location-100)
 d['proj_stuff']=d.stuff+d.gain
@@ -94,6 +94,13 @@ _f=sm.OLS(_b.stuff_next-_b.stuff,sm.add_constant(_b[['stuff','sum_ev','gain_mix'
 print('combined-score weights (ΔStuff+ ~ level + levers, years<=%d):'%(ASOF-1)); print(_f.params.round(3).to_dict(), {k:round(v,3) for k,v in _f.pvalues.items()})
 W={k:max(_f.params[k],0) for k in ['sum_ev','gain_mix','gain_gap','coors_adj']}
 d['opportunity']=sum(W[k]*d[k] for k in W)
+# ACTIONABLE UPSIDE (what an org could do, not what drifts on its own): mix gain in full + best reachable role-unoccupied add
+# valued at precedent Stf+ (no P(add) multiplier; feasibility = precedent share ≥.20 in the sup/pro-compatible neighborhood)
+# + drop-recipe bonus (+1.4, our replicated Driveline effect). Regress-to-comps EXCLUDED.
+d['add_act']=np.where(d.gain>0,d.gain,0.0)
+d['drop_bonus']=1.4*d.drop_recipe
+d['actionable']=d.gain_mix.clip(lower=0)+d.add_act+d.drop_bonus
+d['proj_stuff_act']=d.stuff+d.actionable
 d['proj_stuff_all']=d.stuff+d.opportunity
 # ---- backtest on years <=2025
 nx=d[['pitcher','game_year','stuff','sp_pitching','sp_location']].copy(); nx['game_year']-=1
@@ -111,7 +118,7 @@ b['q']=pd.qcut(b.sum_ev.rank(method='first'),5,labels=False); print(b.groupby('q
 c=d[(d.game_year==ASOF)].copy()
 cols=['PlayerName','Team','Age','role','IP','arm_angle','eff4','suppro_class','stuff','stuff_B_plus_oos','sp_location','sp_pitching','best_add','best_add_pstf','best_add_prec','best_add_padd','gain','sum_ev','n_reachable','npit0' if 'npit0' in c else 'n_precedent_pool','drop_recipe','proj_stuff','proj_pit','d_pit','d_war','d_dollars_M']
 cols=[x for x in cols if x in c.columns]
-top=c.sort_values('opportunity',ascending=False)
+top=c.sort_values('actionable',ascending=False)
 lines=[f"# {ASOF} target cards (as of end of {ASOF} data) — repertoire lever, precedent-valued\n",
 "Method: for each family the pitcher does not throw (<2%), precedent = same-hand, sup/pro-compatible pitchers within the trait neighborhood; "
 "reachable if ≥20% of them throw it ≥10%; gain = 0.14 usage × (precedent Stf+ − current Stuff+)+; P(add) from a grouped-CV binary model; "
