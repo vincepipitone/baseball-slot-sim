@@ -78,3 +78,11 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 - Driveline 2026 recipe replicated: ≥3° droppers with below-avg FF IVB and eff4≥.93 → ΔStuff+ +1.4 (n=54) vs −0.7…−1.0 elsewhere;
   same profile without dropping −1.2; raisers no structure. Borderline p, independent corroboration → keep as a drop-direction
   feasibility screen, not a projected gain.
+
+## Update (2026-08-18, late): target cards (`src/build_targets.py` → `docs/targets_2026.md`, `data/derived/target_cards.parquet`)
+- Repertoire lever per pitcher-season: reachable families (precedent share ≥.20 in the same-hand, sup/pro-compatible neighborhood),
+  gain = 0.14 × (precedent Stf+ − Stuff+)+, P(add) from a binary LightGBM over all pitcher-season × unthrown-family rows
+  (grouped-OOF AUC .785, calibrated by decile), EV = P × gain. Slot = feasibility flag only (Driveline drop recipe, pool count).
+- Valuation: Pit+ = −74.8 + .85·Stf+ + .90·Loc+; ΔPit+ = .85·gain; ΔWAR = .098 (SP)/.074 (RP) per Pit+ per 180 IP; $8M/WAR.
+- Backtest (n=2315): possible-gain vs next-season ΔStuff+ r=.22 raw, ≈.04 after mean reversion → cards are reachability +
+  conditional value, not forecasts. Yesavage: +0.5 max, P .02 → no lever. Palmquist/Hancock: nothing reachable → optimized.
