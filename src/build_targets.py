@@ -84,8 +84,8 @@ d.to_parquet(f'data/derived/target_cards{SUF}.parquet',index=False)
 d.to_parquet(f'data/derived/target_cards{SUF}.parquet',index=False)
 L[['pitcher','game_year','fam','prec','pstf','gain_raw','p_add','reach','gain','ev']].to_parquet(f'data/derived/target_fams{SUF}.parquet',index=False)
 # ---- levers v2 (mix, existing-pitch gap, Coors) + combined opportunity score
-lv=pd.read_parquet('data/derived/levers_v2.parquet')[['pitcher','game_year','gain_mix','worst_fam','worst_use','worst_stf','best_fam','best_use','best_stf','gain_gap','gap_parts','col_share','coors_adj']].drop_duplicates(['pitcher','game_year'])
-d=d.merge(lv,on=['pitcher','game_year'],how='left'); d[['gain_mix','gain_gap','coors_adj']]=d[['gain_mix','gain_gap','coors_adj']].fillna(0)
+lv=pd.read_parquet('data/derived/levers_v2.parquet')[['pitcher','game_year','gain_mix','mix_pit','merged','mix_plan','worst_fam','worst_use','worst_stf','worst_pit','best_fam','best_use','best_stf','best_pit','gain_gap','gap_parts','col_share','coors_adj']].drop_duplicates(['pitcher','game_year'])
+d=d.merge(lv,on=['pitcher','game_year'],how='left'); d[['gain_mix','mix_pit','gain_gap','coors_adj']]=d[['gain_mix','mix_pit','gain_gap','coors_adj']].fillna(0)
 import statsmodels.api as sm
 _nx=d[['pitcher','game_year','stuff']].copy(); _nx['game_year']-=1
 _b=d.merge(_nx,on=['pitcher','game_year'],suffixes=('','_next')).dropna(subset=['stuff_next'])
@@ -99,8 +99,10 @@ d['opportunity']=sum(W[k]*d[k] for k in W)
 # + drop-recipe bonus (+1.4, our replicated Driveline effect). Regress-to-comps EXCLUDED.
 d['add_act']=np.where(d.gain>0,d.gain,0.0)
 d['drop_bonus']=1.4*d.drop_recipe
-d['actionable']=d.gain_mix.clip(lower=0)+d.add_act+d.drop_bonus
-d['proj_stuff_act']=d.stuff+d.actionable
+# actionable in PITCHING+ units: mix optimized on per-pitch Pit+ (label-merged arsenal) + Stuff→Pit (.85) × (add gain + drop bonus)
+d['actionable']=d.mix_pit.clip(lower=0)+0.9*(d.add_act+d.drop_bonus)   # mix_pit = mix gain on 50/50 Stf+/Pit+ blend (label-merged)
+d['proj_stuff_act']=d.stuff+d.gain_mix.clip(lower=0)+d.add_act+d.drop_bonus
+d['proj_pit_act']=d.sp_pitching+d.actionable
 d['proj_stuff_all']=d.stuff+d.opportunity
 # ---- backtest on years <=2025
 nx=d[['pitcher','game_year','stuff','sp_pitching','sp_location']].copy(); nx['game_year']-=1

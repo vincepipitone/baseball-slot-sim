@@ -119,3 +119,10 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   84 FF at 14%; curve 103 reachable; drop-recipe) → proj 109. As-of-2025 actionable top-40 gained +1.8 in 2026 vs −0.6 matched
   (excess +2.4, n=27; top-80 +2.8). Hancock #38, Palmquist #56 as of 2025.
 - Board: default sort Actionable; Drift and Regress shown alongside.
+
+## Update (2026-08-18, evening): cluster-based pitch identity + mix on the Stf+/Pit+ blend
+- `levers_v2.py` merges labels that are one physical pitch (CU/KC, CH/FS, FF/SI, FC/SL within 2.5 mph & 4.5") before mix; mix is
+  optimized on a 50/50 blend of per-pitch Stuff+ and Pitching+ (owner asked for Pit+; pure Pit+ was noisiest prospectively).
+  Prospective (as-of-2025 top-40 excess ΔStuff+/ΔPit+): Stf-mix +2.6/+1.5, Pit-mix +1.1/+2.5 (top-80 ≈0), blend +2.5/+2.5 → blend.
+- 2026: Beck Way #1, Iglesias #26 (changeup no longer "cut"), Glasnow #243 (CU+KC merged). As of 2025: Palmquist #93 actionable /
+  #25 drift (his gain was pitch quality → drift list), Hancock #51.

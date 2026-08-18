@@ -12,32 +12,50 @@ FAM=['FF','SI','FC','FS','SL','CU','KC','CH']
 t=pd.read_parquet('data/derived/emulator_table.parquet'); t=t[(t.n>=30)&t.stf.notna()]
 pr=pd.read_parquet('data/derived/precedent.parquet').drop_duplicates(['pitcher','game_year'])
 fg=pd.read_csv('data/derived/fg_stuff.csv').drop_duplicates(['pitcher','game_year'])[['pitcher','game_year','sp_stuff','sp_location','sp_pitching']]
-# ---- (A) mix optimization
-def optimize(g):
-    g=g.sort_values('stf',ascending=False); u=g.usage.values.copy(); s=g.stf.values; fam=g.fg_type.values
-    isfb=np.isin(fam,['FF','SI','FC']); base=(u*s).sum()/u.sum()
-    u=u/u.sum(); budget=0.20; u2=u.copy()
-    # take from worst pitches, give to best, respecting caps
-    order_best=np.argsort(-s); order_worst=np.argsort(s)
-    for w in order_worst:
-        for b in order_best:
+# ---- (A) mix optimization on per-pitch PITCHING+ (owner: optimize on Pit+), after CLUSTER-BASED identity:
+#      merge labels within a pitcher-season that are the same pitch (same role, |Δvelo|<2.5 mph, movement distance<4.5"):
+#      merged usage = sum, grades = usage-weighted. Kills CU/KC, CH/FS, FF/SI label splits of one physical pitch.
+ROLE={'FF':'ride','SI':'run','FC':'cut','FS':'offspeed','CH':'offspeed','SL':'slider','CU':'curve','KC':'curve'}
+SAME_ROLE_MERGE={('CU','KC'),('KC','CU'),('CH','FS'),('FS','CH'),('FF','SI'),('SI','FF'),('FC','SL'),('SL','FC')}
+def merge_labels(g):
+    g=g[g.n>=20].copy().sort_values('usage',ascending=False)
+    rows=[r for _,r in g.iterrows()]; merged=[]
+    while rows:
+        a=rows.pop(0); keep=[]
+        for b in rows:
+            same=(a.fg_type,b.fg_type) in SAME_ROLE_MERGE or a.fg_type==b.fg_type
+            close=abs(a.release_speed-b.release_speed)<2.5 and np.hypot(a.IVB-b.IVB,a.HB_arm-b.HB_arm)<4.5
+            if same and close:
+                w=a.usage+b.usage
+                for c_ in ['stf','loc','pit','release_speed','IVB','HB_arm']: a[c_]=(a[c_]*a.usage+b[c_]*b.usage)/w
+                a['n']=a.n+b.n; a['usage']=w; a['merged_from']=(a.get('merged_from','') or '')+'+'+b.fg_type
+            else: keep.append(b)
+        merged.append(a); rows=keep
+    return pd.DataFrame(merged)
+def optimize(g,col='pit'):
+    g=g.sort_values(col,ascending=False); u=g.usage.values.copy(); s=g[col].values; fam=g.fg_type.values
+    isfb=np.isin(fam,['FF','SI','FC']); u=u/u.sum(); base=(u*s).sum(); budget=0.20; u2=u.copy()
+    for w in np.argsort(s):
+        for b in np.argsort(-s):
             if b==w or budget<=0: continue
-            room_b=0.45-u2[b]; take=min(u2[w],room_b,budget)
+            take=min(u2[w],0.45-u2[b],budget)
             if take<=0: continue
-            # fastball floor
             trial=u2.copy(); trial[w]-=take; trial[b]+=take
-            if trial[isfb].sum()<0.30: 
-                take=max(0,take-(0.30-trial[isfb].sum())) if isfb[w] and not isfb[b] else take
-                trial=u2.copy(); trial[w]-=take; trial[b]+=take
-                if trial[isfb].sum()<0.30: continue
+            if trial[isfb].sum()<0.30: continue
             u2=trial; budget-=take
     return base,(u2*s).sum(),u2
 rows=[]
 for (pid,yr),g in t.groupby(['pitcher','game_year']):
-    if g.n.sum()<300 or len(g)<2: continue
-    base,opt,u2=optimize(g)
-    worst=g.sort_values('stf').iloc[0]; best=g.sort_values('stf').iloc[-1]
-    rows.append(dict(pitcher=pid,game_year=yr,mix_base=base,mix_opt=opt,gain_mix=opt-base,worst_fam=worst.fg_type,worst_use=worst.usage,worst_stf=worst.stf,best_fam=best.fg_type,best_use=best.usage,best_stf=best.stf))
+    if g.n.sum()<300: continue
+    gm=merge_labels(g)
+    if len(gm)<2 or gm.pit.isna().any(): continue
+    gm['blend']=0.5*gm.stf+0.5*gm.pit
+    base_p,opt_p,u2=optimize(gm,'blend'); base_s,opt_s,_=optimize(gm,'stf')
+    worst=gm.sort_values('blend').iloc[0]; best=gm.sort_values('blend').iloc[-1]
+    rows.append(dict(pitcher=pid,game_year=yr,mix_base=base_s,mix_opt=opt_s,gain_mix=opt_s-base_s,mix_pit=opt_p-base_p,n_pitches_merged=len(gm),
+        merged=' '.join(f"{r_.fg_type}{r_['merged_from']}" for _,r_ in gm.iterrows() if isinstance(r_.get('merged_from',None),str) and r_['merged_from']),
+        worst_fam=worst.fg_type,worst_use=worst.usage,worst_stf=worst.stf,worst_pit=worst.pit,best_fam=best.fg_type,best_use=best.usage,best_stf=best.stf,best_pit=best.pit,
+        mix_plan=', '.join(f"{f} {a*100:.0f}→{b*100:.0f}%" for f,a,b in zip(gm.sort_values('blend',ascending=False).fg_type,gm.sort_values('blend',ascending=False).usage/gm.usage.sum(),u2) if abs(a-b)>0.005)))
 M=pd.DataFrame(rows)
 # ---- (B) existing-pitch precedent gap
 G=[]
