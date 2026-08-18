@@ -126,3 +126,9 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   Prospective (as-of-2025 top-40 excess ΔStuff+/ΔPit+): Stf-mix +2.6/+1.5, Pit-mix +1.1/+2.5 (top-80 ≈0), blend +2.5/+2.5 → blend.
 - 2026: Beck Way #1, Iglesias #26 (changeup no longer "cut"), Glasnow #243 (CU+KC merged). As of 2025: Palmquist #93 actionable /
   #25 drift (his gain was pitch quality → drift list), Hancock #51.
+
+## Update (2026-08-18, night): The Carson Palmquist Model (`docs/CARSON-PALMQUIST-MODEL.md`)
+- Gate = plus pitch (Stf+≥105) inside an ordinary arsenal (Stuff+ 88–104). Engine A (development): GBM on next-season ΔStuff+
+  from structural features; strict 2025→26 test top-10 +3.9 (gated; Palmquist #3, Dollander #2), +7.9 ungated (Palmquist #7).
+  Engine B (reconfiguration) = Actionable. Combined z-sum: Palmquist #7 of 165 going into 2026; Way #13 of 176 in 2026.
+- ΔPit+ target rejected (Loc+ mean reversion dominates; Bummer #1). Scripts: palmquist_model.py, palmquist_model_variants.py.
