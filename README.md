@@ -169,3 +169,8 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   Gated CPM 2025→26: top-10 excess +3.0 Stuff+ / +2.1 Pit+; top-25 +2.8. Hancock #1, Dollander #3, Palmquist #15 of 201 (gate now
   includes 2025 pitchers without a 2026 season). 2026: Mason Black #6, Way #27.
 - The own-model scripts remain in the repo as research (fit_stuff_rv.py, stuff_model.py); they are not used downstream.
+
+## Update (2026-08-18, night): CPM for everyone
+- CPM = z(dev) + z(actionable) across ALL pitchers (archetype toggle is a filter, not a scoring gate); LightGBM handles missing
+  features natively so every pitcher gets a Dev. 2025→26: CPM-all top-10 excess +4.8 Stuff+ / +3.7 Pit+, top-25 +4.4, top-40 +3.0;
+  within gate top-10 +2.9. Hancock #6, Dollander #7, Sasaki #14 (out of gate), Palmquist #32 (gate #16) of 574. 2026: Black #9, Way #60.
