@@ -144,3 +144,10 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   Black → pronator; Hancock 2023–26: pronator → pronator → hybrid → supinator (matches Rosen). Class counts: 1179 P / 1570 S / 310 H.
 - Chain rerun (precedent neighborhoods use class). CPM as-of-2025 top-10 excess +3.9 Stuff+ / +4.9 Pit+; top-40 +2.8/+2.7.
   Going into 2026: Hancock #1, Dollander #4, Palmquist #12. 2026: Mason Black #4, Way #38.
+
+## Update (2026-08-18, night): rolling backtest + calibration of Dev ΔStf+ (`src/backtest_dev.py`)
+- Rolling origins 2021→22 … 2025→26 (train strictly on earlier seasons): r = .22/.27/.44/.29/.27 (pooled .30); ungated top-25 excess
+  vs stuff-matched +0.2/+1.6/+5.7/+2.3/+4.5 (positive 5/5, mean +2.9); gated top-10 +0.2/+2.9/+7.5/−1.2/+6.1.
+- Calibration by predicted bucket: −5→−3.7, −1→−1.4, +1→+0.6, +3→+1.5, +4–6→+4.8 (44% chance of ≥5 gain), >+6 (n=10)→~0.
+  realized ≈ −0.3 + 0.69×pred; sd ≈ 6 in every bucket; max prediction ever +8.3. Board now shows calibrated Dev and P(≥5).
+- "Regress" relabeled "Gap vs comps → expected" (expected ≈ 0.2×gap; Blewett's 11.6 gap ≈ +2–3 expected, and he is out of the gate).
