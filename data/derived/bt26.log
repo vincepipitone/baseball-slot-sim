@@ -1,0 +1,34 @@
+add-propensity: rows 6471, base rate 0.047, grouped-OOF AUC 0.765
+dec        0        1        2        3        4        5        6        7        8        9
+p      0.003    0.005    0.008    0.012    0.017    0.023    0.033    0.048    0.077    0.187
+obs    0.005    0.009    0.012    0.017    0.025    0.036    0.048    0.068    0.102    0.147
+n    648.000  647.000  647.000  647.000  647.000  647.000  647.000  647.000  647.000  647.000
+combined-score weights (ΔStuff+ ~ level + levers, years<=2025):
+{'const': 11.567, 'stuff': -0.133, 'sum_ev': 2.622, 'gain_mix': 0.063, 'gain_gap': 0.31, 'coors_adj': 0.09} {'const': 0.0, 'stuff': 0.0, 'sum_ev': 0.031, 'gain_mix': 0.184, 'gain_gap': 0.0, 'coors_adj': 0.91}
+opportunity: r(opp, ΔStuff+) 0.316 | after mean reversion 0.099
+
+backtest n=2274: r(gain, ΔStuff+) 0.216 | r(EV, ΔStuff+) 0.167 | r(sum_EV, ΔStuff+) 0.167 | r(EV, ΔPit+) 0.107 | r(stuff level, ΔStuff+) -0.323
+after removing mean reversion: r(gain, resid) 0.047 | r(EV, resid) 0.049 | r(sum_EV, resid) 0.055
+q             0       1       2       3       4
+n        455.00  455.00  454.00  455.00  455.00
+sum_ev     0.00    0.00    0.00    0.03    0.20
+d_stuff   -2.55   -1.57   -0.86    0.29    1.12
+resid     -1.07    0.27    0.27    0.25    0.27
+
+wrote docs/targets_2026.md; 2026 pitchers: 499
+        PlayerName  Team role  stuff best_add  best_add_pstf  best_add_padd  gain  sum_ev  d_war
+     Albert Suárez   BAL   RP  84.59       SL         104.25           0.34  2.75    1.20   0.05
+ Eduardo Rodriguez   ARI   SP  91.58       SL         111.17           0.32  2.74    0.88   0.19
+        Will Klein   LAD   RP  94.86       SI         112.20           0.19  2.43    0.67   0.03
+       Jalen Beeks   TEX   RP  88.73       SL         106.58           0.15  2.50    0.62   0.03
+       Jared Jones   PIT   SP 100.72       SI         115.47           0.24  2.06    0.60   0.06
+        Adam Macko   TOR   RP  97.99       FC         109.95           0.24  1.67    0.58   0.02
+       Kirby Yates - - -   RP  88.43       SL         107.55           0.16  2.68    0.51   0.04
+       Dean Kremer - - -   SP  90.48       SL         106.72           0.20  2.27    0.46   0.06
+      Matthew Boyd   CHC   SP  95.84       SI         103.66           0.38  1.09    0.42   0.04
+        Eric Lauer - - -   SP  88.70       SI          97.99           0.30  1.30    0.39   0.06
+Brennan Bernardino   COL   RP  91.48       SL         109.75           0.14  2.56    0.36   0.04
+  Tyler Schweitzer   CHW   RP  98.50       SI         109.22           0.14  1.50    0.36   0.02
+     Drew Anderson   DET   RP  98.88       SI         105.87           0.35  0.98    0.35   0.03
+     Yusei Kikuchi   LAA   SP  97.84       SI         103.23           0.46  0.75    0.34   0.02
+   Mark Leiter Jr.   ATH   RP  91.80       SL          98.25           0.37  0.90    0.33   0.01

@@ -1,0 +1,34 @@
+add-propensity: rows 5478, base rate 0.043, grouped-OOF AUC 0.756
+dec        0        1        2        3        4        5        6        7        8        9
+p      0.003    0.005    0.007    0.010    0.014    0.018    0.026    0.039    0.067    0.184
+obs    0.007    0.015    0.013    0.016    0.022    0.033    0.031    0.055    0.095    0.148
+n    548.000  548.000  548.000  547.000  548.000  548.000  547.000  548.000  548.000  548.000
+combined-score weights (ΔStuff+ ~ level + levers, years<=2024):
+{'const': 12.395, 'stuff': -0.141, 'sum_ev': 1.565, 'gain_mix': 0.05, 'gain_gap': 0.34, 'coors_adj': 0.034} {'const': 0.0, 'stuff': 0.0, 'sum_ev': 0.188, 'gain_mix': 0.345, 'gain_gap': 0.0, 'coors_adj': 0.969}
+opportunity: r(opp, ΔStuff+) 0.324 | after mean reversion 0.100
+
+backtest n=1897: r(gain, ΔStuff+) 0.229 | r(EV, ΔStuff+) 0.153 | r(sum_EV, ΔStuff+) 0.155 | r(EV, ΔPit+) 0.112 | r(stuff level, ΔStuff+) -0.333
+after removing mean reversion: r(gain, resid) 0.046 | r(EV, resid) 0.032 | r(sum_EV, resid) 0.041
+q             0       1       2       3       4
+n        380.00  379.00  379.00  379.00  380.00
+sum_ev     0.00    0.00    0.00    0.02    0.21
+d_stuff   -2.48   -1.55   -1.04    0.46    1.05
+resid     -0.93    0.53    0.15    0.27   -0.02
+
+wrote docs/targets_2026.md; 2026 pitchers: 574
+       PlayerName  Team role  stuff best_add  best_add_pstf  best_add_padd  gain  sum_ev  d_war
+  Chase Dollander   COL   SP  97.41       SL         114.27           0.42  2.36    0.98   0.11
+  Lyon Richardson   CIN   RP  92.77       SL         112.40           0.32  2.75    0.91   0.04
+        Jake Eder   LAA   RP  89.33       SI         102.82           0.43  1.89    0.83   0.03
+  Griffin Canning   NYM   SP  90.25       SI          96.77           0.65  0.91    0.59   0.03
+    Victor Vodnik   COL   RP  97.70       SI         111.48           0.28  1.93    0.57   0.03
+      Jalen Beeks   ARI   RP  91.95       SL         108.80           0.16  2.36    0.48   0.05
+Antonio Senzatela   COL   SP  85.33       FC         101.33           0.21  2.24    0.47   0.13
+   Anthony Molina   COL   RP  93.51       FC         102.32           0.37  1.23    0.46   0.02
+    Mason Englert   TBR   RP  94.67       SL         106.11           0.23  1.60    0.37   0.02
+       Ian Gibaut   CIN   RP  89.08       SI          99.43           0.24  1.45    0.36   0.02
+        José Ruiz - - -   RP  97.56       SL         110.12           0.21  1.76    0.36   0.02
+     Luis Morales   ATH   SP  97.79       CU         108.50           0.03  1.50    0.36   0.04
+        Max Lazar   PHI   RP  92.96       SL         102.69           0.25  1.36    0.34   0.02
+     Luke Jackson - - -   RP  92.61       CH         106.00           0.04  1.87    0.32   0.03
+      Luke Weaver   NYY   RP  97.13       SL         113.67           0.13  2.32    0.30   0.05

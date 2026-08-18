@@ -5,6 +5,8 @@ FG_MAP={'ST':'SL','SV':'SL','SL':'SL','CS':'CU','CU':'CU','KC':'KC','FF':'FF','S
 p=pd.read_parquet('data/derived/pitches.parquet')
 p['fg_type']=p.pitch_type.map(FG_MAP)
 p=p[p.fg_type.notna()].copy()
+# canonical name per pitcher id (source has truncated variants like 'Woods Richardson, Sime')
+canon=p.groupby('pitcher').player_name.agg(lambda s:s.value_counts().idxmax()); p['player_name']=p.pitcher.map(canon)
 key=['pitcher','player_name','p_throws','game_year','fg_type']
 means=['release_speed','IVB','HB','VAA','HAA','VRA','HRA','VAA_AA_pt','VAA_AA_velo','VAA_AA_all','HAA_AA_pt','HAA_AA_all',
        'AzOE','AxOE','PythagOE','arm_angle','release_pos_x','release_pos_z','release_extension','release_spin_rate','spin_axis',
