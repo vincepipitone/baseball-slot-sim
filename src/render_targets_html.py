@@ -38,6 +38,8 @@ h2{font-size:24px;font-weight:600;margin:34px 0 10px}
 .controls input,.controls select{font:inherit;padding:7px 10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:2px}
 .controls input:focus,.controls select:focus,button:focus,tr.row:focus{outline:2px solid var(--accent);outline-offset:1px}
 .controls .n{color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
+button.yr{font:inherit;padding:7px 12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:2px;cursor:pointer}
+button.yr[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
 .tbl{overflow-x:auto;border:1px solid var(--line);background:var(--panel)}
 table{border-collapse:collapse;width:100%;min-width:1180px}
 th,td{padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
@@ -91,6 +93,7 @@ document.getElementById('role').addEventListener('change',e=>{filt.role=e.target
 document.getElementById('cls').addEventListener('change',e=>{filt.cls=e.target.value;render()});
 document.getElementById('reach').addEventListener('change',e=>{filt.reach=e.target.checked;render()});
 document.getElementById('drop').addEventListener('change',e=>{filt.drop=e.target.checked;render()});
+document.querySelectorAll('button.yr').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('button.yr').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');document.getElementById('cpm2026').hidden=b.dataset.y!=='2026';document.getElementById('cpm2025').hidden=b.dataset.y!=='2025';}));
 render();
 """
 ths=''.join(f'<th data-k="{k}" class="{c if len(x)>2 else ""}">{lab}</th>' for x in [['name','Pitcher','l'],['team','Tm','l'],['age','Age'],['role','Role','l'],['ip','IP'],['slot','Slot°'],['eff4','4S eff'],['cls','Class','l'],['stuff','Stuff+'],['own','Own'],['loc','Loc+'],['act','Actionable'],['mixb','Mix'],['best','Best add','l'],['bpstf','Prec Stf+'],['addact','Add gain'],['dropb','Drop'],['projact','Proj Stf+'],['opp','Drift'],['gap','Regress'],['ev','Add ΣEV'],['bp','P(add)'],['coors','Coors'],['pool','Pool']] for k,lab,*c in [x] for c in [c[0] if c else ''])
@@ -102,9 +105,19 @@ def check(nm):
     return f'<div class="check"><div class="h">{r.PlayerName} <span style="color:var(--muted);font-weight:400">{r.Team} · {r.role}</span></div><div>Slot {r.arm_angle:.0f}°, 4S efficiency {r.eff4:.2f}, {str(r.suppro_class).replace("_"," ")}. Stuff+ {r.stuff:.0f} (own {r.stuff_B_plus_oos:.0f}), Loc+ {r.sp_location:.0f}.</div><div style="margin-top:6px">Reachable roles {r.n_reachable:.0f}; best add {ba}{"" if ba=="—" else f" (prec Stf+ {r.best_add_pstf:.0f}, share {r.best_add_prec:.2f}, P {r.best_add_padd:.2f})"}; gain <span class="{ "pos" if r.gain>0 else ""}">{r.gain:+.1f}</span>; pool n={r[pool]:.0f}.</div><div style="margin-top:6px">Pitch gap {r.gain_gap:+.1f}{gp}; mix {r.gain_mix:+.1f}; Coors {r.coors_adj:+.1f}; <strong>actionable {r.actionable:.1f}</strong> (mix {r.gain_mix:+.1f}, add {r.add_act:+.1f}, drop {r.drop_bonus:+.1f} → proj {r.proj_stuff_act:.0f}); drift {r.opportunity:.2f}.</div></div>'
 checks=''.join(check(n) for n in ['Beck Way','Yesavage','Palmquist','Hancock'])
 try:
-    cpm=pd.read_parquet('data/derived/cpm_2026.parquet').sort_values('cpm',ascending=False).head(25)
-    cpm_rows=''.join(f"<tr><td class='l' style='color:var(--muted)'>{i}</td><td class='l'>{x.PlayerName}</td><td class='l'>{x.Team}</td><td>{x.Age:.0f}</td><td class='l'>{x.role}</td><td>{x.stuff:.0f}</td><td>{x.sp_pitching:.0f}</td><td>{x.pp_stf:.0f} @ {x.pp_use*100:.0f}%</td><td>{x.fb_liability:.1f}</td><td>{x.gain_gap:.1f}</td><td>{x.mix_pit:+.1f}</td><td>{'Y' if x.drop_recipe else ''}</td><td>{x.pred:+.1f}</td><td>{x.actionable:.1f}</td><td><strong>{x.cpm:.2f}</strong></td></tr>" for i,(_,x) in enumerate(cpm.iterrows(),1))
-    cpm_html=f'''<h2>The Carson Palmquist Model — 2026 list</h2><p class="sub" style="max-width:100ch">Gate: owns a plus pitch (Stf+ ≥105) inside an ordinary arsenal (Stuff+ 88–104). Rank = z(development engine: GBM-predicted next-season ΔStuff+ from structural features; strict 2025→26 test top-10 +3.9 over matched, Palmquist #3 in the gate) + z(reconfiguration engine: the Actionable score). Going into 2026 this had Palmquist #7 of 165; today Way is #13 of 176. See docs/CARSON-PALMQUIST-MODEL.md.</p><div class="tbl"><table style="min-width:900px"><thead><tr><th class="l">#</th><th class="l">Pitcher</th><th class="l">Tm</th><th>Age</th><th class="l">Role</th><th>Stuff+</th><th>Pit+</th><th>Plus pitch</th><th>FB liab.</th><th>Regress</th><th>Mix</th><th>Drop</th><th>Dev ΔStf+</th><th>Actionable</th><th>Score</th></tr></thead><tbody>{cpm_rows}</tbody></table></div>'''
+    def cpm_table(path,realized):
+        cpm=pd.read_parquet(path).sort_values('cpm',ascending=False)
+        rows=''
+        for i,(_,x) in enumerate(cpm.head(40).iterrows(),1):
+            real=f"<td class='{'pos' if x.d_stuff>0 else 'neg'}'>{x.d_stuff:+.1f}</td><td class='{'pos' if x.d_pit>0 else 'neg'}'>{x.d_pit:+.1f}</td>" if realized else ''
+            hl=" style='background:var(--gain-bg)'" if ('Palmquist' in str(x.PlayerName) or 'Beck Way' in str(x.PlayerName)) else ''
+            rows+=f"<tr{hl}><td class='l' style='color:var(--muted)'>{i}</td><td class='l'>{x.PlayerName}</td><td class='l'>{x.Team}</td><td>{x.Age:.0f}</td><td class='l'>{x.role}</td><td>{x.stuff:.0f}</td><td>{x.sp_pitching:.0f}</td><td>{x.pp_stf:.0f} @ {x.pp_use*100:.0f}%</td><td>{x.fb_liability:.1f}</td><td>{x.gain_gap:.1f}</td><td>{x.mix_pit:+.1f}</td><td>{'Y' if x.drop_recipe else ''}</td><td>{x.pred:+.1f}</td><td>{x.actionable:.1f}</td><td><strong>{x.cpm:.2f}</strong></td>{real}</tr>"
+        rh="<th>2026 ΔStf+</th><th>2026 ΔPit+</th>" if realized else ''
+        return f'<div class="tbl"><table style="min-width:900px"><thead><tr><th class="l">#</th><th class="l">Pitcher</th><th class="l">Tm</th><th>Age</th><th class="l">Role</th><th>Stuff+</th><th>Pit+</th><th>Plus pitch</th><th>FB liab.</th><th>Regress</th><th>Mix</th><th>Drop</th><th>Dev ΔStf+</th><th>Actionable</th><th>Score</th>{rh}</tr></thead><tbody>{rows}</tbody></table></div>', len(cpm)
+    t26,n26=cpm_table('data/derived/cpm_2026.parquet',False); t25,n25=cpm_table('data/derived/cpm_test2025.parquet',True)
+    cpm_html=f'''<h2>The Carson Palmquist Model</h2><p class="sub" style="max-width:100ch">Gate: owns a plus pitch (any offering Stf+ ≥105) inside an ordinary arsenal (Stuff+ 88–104). Score = z(development engine: GBM-predicted next-season ΔStuff+ from structural features, trained on seasons before the one shown) + z(reconfiguration engine: the Actionable score). Ranks are within the gate: {n25} pitchers in 2025, {n26} in 2026. Highlighted rows: Palmquist, Way. Full spec: docs/CARSON-PALMQUIST-MODEL.md.</p>
+<div class="controls" style="margin-top:6px"><button class="yr" data-y="2026" aria-pressed="true">2026 · today</button><button class="yr" data-y="2025" aria-pressed="false">2025 · going into 2026, with what happened</button></div>
+<div id="cpm2026">{t26}</div><div id="cpm2025" hidden>{t25}</div>'''
 except Exception as e:
     cpm_html=''
 head=f"""<title>Reachable Arsenal Board</title>
