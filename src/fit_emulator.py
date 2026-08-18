@@ -26,7 +26,9 @@ def evaluate(feats,label):
     # temporal AND grouped: 2026 pitchers not seen in 2024-25
     seen=set(t.pitcher[tr]); te2=te&(~t.pitcher.isin(seen)).values
     tmp2=r2(y[te2],fit(X[tr],y[tr],w[tr]).predict(X[te2]),w[te2]) if te2.sum()>50 else np.nan
-    print(f"{label:28s} in-sample {ins:.3f} | grouped-OOS {grp:.3f} | gap {ins-grp:+.3f} | temporal26 {tmp:.3f} | temporal26 new pitchers {tmp2:.3f} (n={te2.sum()})",flush=True)
+    tr3=(t.game_year<=2023).values; te3=(t.game_year>=2024).values&(t.game_year<=2025).values
+    tmp3=r2(y[te3],fit(X[tr3],y[tr3],w[tr3]).predict(X[te3]),w[te3])
+    print(f"{label:28s} in-sample {ins:.3f} | grouped-OOS {grp:.3f} | gap {ins-grp:+.3f} | temporal26 {tmp:.3f} | new-pitchers26 {tmp2:.3f} (n={te2.sum()}) | train<=23→24-25 {tmp3:.3f}",flush=True)
     return oos
 print(f"rows {len(t)}  pitchers {t.pitcher.nunique()}  min_n {MIN_N}")
 oos=evaluate(BASE,'baseline')

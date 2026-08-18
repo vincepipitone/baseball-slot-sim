@@ -21,11 +21,16 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 4. `src/fit_emulator.py [min_n]` — season-level Stuff+ emulator; `src/fit_emulator_pitchlevel.py` — pitch-level.
    Both evaluated per the identity-leakage protocol (in-sample vs grouped-K-fold-by-pitcher vs temporal).
 
-## Results so far (2026-08-18)
-- Emulator (season-level, n≥50): in-sample R² .84 → grouped-OOS .635 (gap +.21, matches @tomdoyo's
-  leakage finding); temporal 24-25→26 .68; unseen-pitchers-in-26 .56. Pitch-level: .62 / .72 / .56.
-  Ablating x0/z0/extension/dead-zone does NOT shrink the gap here — leakage is pitcher-pitch persistence
-  across seasons, not release position per se.
-- Within-pitcher Δ (OOS pred on new shape − old shape vs realized ΔStf+): r=.47 all, .55 on ≥5° slot
-  changers, .65 on FF (slope 1.1). This is the simulator-relevant number.
-- Corpora in 2024–26: 86 slot-changers ≥5° (36 steeper / 50 flatter); ~141 pitch additions (<2%→≥8%).
+## Results so far (2026-08-18, full 2020–26 span; 4.58M pitches, 15.4k pitcher-season-pitch rows w/ FG target)
+- Stuff+ emulator (n≥50): in-sample R² .80 → grouped-OOS-by-pitcher .648 (gap .15; leakage claim reproduced —
+  on 2024–26 only the gap was .21). Forward: train ≤2023 → 2024-25 .668; → 2026 .657; unseen-2026 pitchers .56.
+  Ablating x0/z0/dead-zone: no change; extension is real signal (−.02 when dropped).
+- Within-pitcher Δ (OOS pred on new shape − old shape vs realized ΔStf+, n≥100 both seasons):
+  all r=.53 slope .97 (n=6680) | ≥5° slot changers r=.59 slope 1.03 (n=864; steeper .61, flatter .57) | FF .65.
+- Corpora: 349 slot-changers ≥5° (131 steeper / 218 flatter; mean ΔStuff+ ≈ 0 both ways → base rate is zero,
+  the model's job is separating who pays); 393 pitch additions (<2%→≥8%; 112 SI, 105 FC, 56 SL…; 21 abandoned).
+- Precedent (kNN, same hand, own pitcher excluded, functional roles): which-pitch top-1 .52 vs slot-bucket base
+  .49 (top-2 .73 vs .78 — needs a real classifier); added-pitch quality r(precedent Stf+, realized)=.53.
+  Yesavage 2026: precedent pool n=16, optionality 1.1, only lever a 12-6 curve (comps 111 vs his 108) → the
+  "no stuff lever, north-south only" check passes from the data. Palmquist 2026: optionality 0 (now optimal).
+- Scripts: build_corpora.py, precedent.py, test_delta.py.
