@@ -100,8 +100,8 @@ d['opportunity']=sum(W[k]*d[k] for k in W)
 d['add_act']=np.where(d.gain>0,d.gain,0.0)
 d['drop_bonus']=1.4*d.drop_recipe
 # actionable in PITCHING+ units: mix optimized on per-pitch Pit+ (label-merged arsenal) + Stuff→Pit (.85) × (add gain + drop bonus)
-d['actionable']=d.mix_pit.clip(lower=0)+0.9*(d.add_act+d.drop_bonus)   # mix_pit = mix gain on 50/50 Stf+/Pit+ blend (label-merged)
-d['proj_stuff_act']=d.stuff+d.gain_mix.clip(lower=0)+d.add_act+d.drop_bonus
+d['actionable']=0.5*d.mix_pit.clip(lower=0)+d.add_act+d.drop_bonus   # empirically scaled: mix ×0.5 (actors realize ~half of dose; mean effect right), add ×1.0 (r .33, slope 1.2 among adders), drop +1.4 (replicated)
+d['proj_stuff_act']=d.stuff+0.5*d.gain_mix.clip(lower=0)+d.add_act+d.drop_bonus
 d['proj_pit_act']=d.sp_pitching+d.actionable
 d['proj_stuff_all']=d.stuff+d.opportunity
 # ---- backtest on years <=2025

@@ -151,3 +151,11 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 - Calibration by predicted bucket: −5→−3.7, −1→−1.4, +1→+0.6, +3→+1.5, +4–6→+4.8 (44% chance of ≥5 gain), >+6 (n=10)→~0.
   realized ≈ −0.3 + 0.69×pred; sd ≈ 6 in every bucket; max prediction ever +8.3. Board now shows calibrated Dev and P(≥5).
 - "Regress" relabeled "Gap vs comps → expected" (expected ≈ 0.2×gap; Blewett's 11.6 gap ≈ +2–3 expected, and he is out of the gate).
+
+## Update (2026-08-18, night): Own ablation, Actionable scaling, archetype toggle
+- Own−FG in the dev engine: rolling r .318 vs .305 without, top-25 excess +3.5 vs +3.3 → keep (board shows Own−FG, not raw Own).
+- Actionable was accounting, not fitted. Conditional tests: MIX — pitchers who raised best-pitch usage ≥10 pts (n=267) gained +1.5 vs
+  −1.2 for non-movers (mean effect ≈ predicted +2.7) but dose-response weak (r .09, slope .28) → ×0.5. ADD — among 360 adders,
+  realized vs usage×(pStf−stuff): r .33, slope 1.2 → ×1.0. DROP +1.4 replicated. Actionable = 0.5·mix + add + drop.
+- Board: 'Gate' column replaced by a default-on toggle "Palmquist archetype only — a plus pitch (Stf+ ≥105) inside an ordinary arsenal
+  (Stuff+ 88–104)". CPM as-of-2025 top-10 +2.4/+3.8, top-25 +2.3/+1.9; Hancock #1, Dollander #2, Palmquist #11; 2026 Black #4, Way #33.
