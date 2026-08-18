@@ -28,6 +28,21 @@ def load():
         rows = c.execute_list_query(q)
     df = pd.DataFrame(rows, columns=COLS)
     df['game_year'] = df['game_year'].astype(int)
+    df['src'] = 'hyper'
+    # pybaseball backfill (2020-23; anything outside the extract's years)
+    parts = []
+    for f in sorted(glob.glob('data/raw/statcast_*.parquet')):
+        d = pd.read_parquet(f)
+        d['SP_RP'] = None
+        d = d.reindex(columns=COLS); parts.append(d)
+    if parts:
+        b = pd.concat(parts, ignore_index=True)
+        b['game_year'] = b['game_year'].astype(int)
+        b = b[~b.game_year.isin(df.game_year.unique())]
+        b['src'] = 'pybaseball'
+        for c in ['pitcher','game_pk','at_bat_number','pitch_number','zone']:
+            b[c] = pd.to_numeric(b[c], errors='coerce')
+        df = pd.concat([df, b], ignore_index=True)
     return df
 
 def angles(df):
