@@ -90,9 +90,9 @@ import statsmodels.api as sm
 _nx=d[['pitcher','game_year','stuff']].copy(); _nx['game_year']-=1
 _b=d.merge(_nx,on=['pitcher','game_year'],suffixes=('','_next')).dropna(subset=['stuff_next'])
 _b=_b[_b.game_year<=ASOF-1]
-_f=sm.OLS(_b.stuff_next-_b.stuff,sm.add_constant(_b[['stuff','sum_ev','gain_mix','gain_gap','coors_adj']])).fit()
+_f=sm.OLS(_b.stuff_next-_b.stuff,sm.add_constant(_b[['stuff','sum_ev','gain_mix','gain_gap']])).fit()
 print('combined-score weights (ΔStuff+ ~ level + levers, years<=%d):'%(ASOF-1)); print(_f.params.round(3).to_dict(), {k:round(v,3) for k,v in _f.pvalues.items()})
-W={k:max(_f.params[k],0) for k in ['sum_ev','gain_mix','gain_gap','coors_adj']}
+W={k:max(_f.params[k],0) for k in ['sum_ev','gain_mix','gain_gap']}
 d['opportunity']=sum(W[k]*d[k] for k in W)
 # ACTIONABLE UPSIDE (what an org could do, not what drifts on its own): mix gain in full + best reachable role-unoccupied add
 # valued at precedent Stf+ (no P(add) multiplier; feasibility = precedent share ≥.20 in the sup/pro-compatible neighborhood)

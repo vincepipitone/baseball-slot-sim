@@ -16,7 +16,7 @@ nx=fg.copy(); nx['game_year']-=1
 d5=d5.merge(nx,on=['pitcher','game_year'],how='left',suffixes=('','_next')); d5['d_stuff']=d5.sp_stuff_next-d5.stuff; d5['d_pit']=d5.sp_pitching_next-d5.sp_pitching
 d5['young']=(d5.Age<=27).astype(int); d6['young']=(d6.Age<=27).astype(int)
 d5['ppu_x_young']=d5.ppu_stf*d5.young; d6['ppu_x_young']=d6.ppu_stf*d6.young
-BASE=['stuff','Age','is_sp','ppu','best_minus_ars','fb_liability','gain_gap','mix_pit','add_act','sum_ev','drop_recipe','eff4','cls_S','cls_P','col_share','own_minus_fg','sp_location','fb_velo','n_precedent_pool']
+BASE=['stuff','Age','is_sp','ppu','best_minus_ars','fb_liability','gain_gap','mix_pit','add_act','sum_ev','drop_recipe','eff4','cls_S','cls_P','col_share','sp_location','fb_velo','n_precedent_pool']
 ARCH=BASE+['pp_stf','pp_use','ppu_stf','plus_pitch','young','ppu_x_young']
 P=dict(objective='regression',learning_rate=0.03,num_leaves=7,min_data_in_leaf=40,feature_fraction=0.8,bagging_fraction=0.8,bagging_freq=1,lambda_l2=10,verbose=-1,seed=1)
 def excess(df,col,k,tgt,lvl):

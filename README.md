@@ -159,3 +159,13 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   realized vs usage×(pStf−stuff): r .33, slope 1.2 → ×1.0. DROP +1.4 replicated. Actionable = 0.5·mix + add + drop.
 - Board: 'Gate' column replaced by a default-on toggle "Palmquist archetype only — a plus pitch (Stf+ ≥105) inside an ordinary arsenal
   (Stuff+ 88–104)". CPM as-of-2025 top-10 +2.4/+3.8, top-25 +2.3/+1.9; Hancock #1, Dollander #2, Palmquist #11; 2026 Black #4, Way #33.
+
+## Update (2026-08-18, night): own model dropped from the product; dev prediction for everyone (`src/build_cpm.py`)
+- Owner call: the own run-value Stuff model isn't additive to the product → removed from the development engine's features, from the
+  board (Own/Own−FG), and the Coors lever (own-model road-minus-all) dropped from Drift. Calibration unchanged: realized ≈ −0.29 +
+  0.67×raw, pooled r .29; calibrated +3–5 → +3.3 (39% ≥5, 27% decline).
+- Ungated development prediction now computed and shown for ALL pitchers (dev_all_2026/2025.parquet); CPM stays the gated composite.
+  As of 2025 (ungated dev): Hancock #6, Sasaki #13, Palmquist #20, Dollander #22 of 521; Harrison #481 (already 104).
+  Gated CPM 2025→26: top-10 excess +3.0 Stuff+ / +2.1 Pit+; top-25 +2.8. Hancock #1, Dollander #3, Palmquist #15 of 201 (gate now
+  includes 2025 pitchers without a 2026 season). 2026: Mason Black #6, Way #27.
+- The own-model scripts remain in the repo as research (fit_stuff_rv.py, stuff_model.py); they are not used downstream.

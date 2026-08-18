@@ -34,7 +34,7 @@ def structural(base):
     d['is_sp']=(d.role=='SP').astype(int); d['cls_S']=d.suppro_class.isin(['supinator','lean_supinator']).astype(int); d['cls_P']=d.suppro_class.isin(['pronator','lean_pronator']).astype(int)
     d['col_share']=d.col_share.fillna(0)
     return d
-F=['stuff','Age','is_sp','ppu','best_minus_ars','fb_liability','gain_gap','mix_pit','add_act','sum_ev','drop_recipe','eff4','cls_S','cls_P','col_share','own_minus_fg','sp_location','fb_velo','n_precedent_pool']
+F=['stuff','Age','is_sp','ppu','best_minus_ars','fb_liability','gain_gap','mix_pit','add_act','sum_ev','drop_recipe','eff4','cls_S','cls_P','col_share','sp_location','fb_velo','n_precedent_pool']
 d5=structural(tc5[tc5.n_tot>=300]); d6=structural(tc[(tc.n_tot>=300)&(tc.game_year==2026)])
 nx=fg.copy(); nx['game_year']-=1
 d5=d5.merge(nx,on=['pitcher','game_year'],how='left',suffixes=('','_next')); d5['d_stuff']=d5.sp_stuff_next-d5.stuff; d5['d_pit']=d5.sp_pitching_next-d5.sp_pitching
