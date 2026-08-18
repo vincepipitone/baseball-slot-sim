@@ -2,48 +2,48 @@ Coors: pitcher-seasons with >=25% pitches at COL: 223; mean own-model stuff home
 
 backtest n=2667 (2020-25 → next season):
   mix gain             r(ΔStuff+) +0.087 | after mean-reversion +0.039 | r(ΔPit+) +0.061 | mean 2.43 p90 5.13
-  existing-pitch gap   r(ΔStuff+) +0.279 | after mean-reversion +0.077 | r(ΔPit+) +0.105 | mean 2.40 p90 5.80
+  existing-pitch gap   r(ΔStuff+) +0.280 | after mean-reversion +0.079 | r(ΔPit+) +0.106 | mean 2.40 p90 5.82
   coors adj            r(ΔStuff+) +0.067 | after mean-reversion +0.036 | r(ΔPit+) +0.009 | mean 0.02 p90 0.00
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const         13.8485      1.789      7.741      0.000      10.340      17.357
-sp_stuff      -0.1560      0.016     -9.485      0.000      -0.188      -0.124
-gain_mix       0.1068      0.051      2.089      0.037       0.007       0.207
-gain_gap       0.3125      0.061      5.130      0.000       0.193       0.432
-coors_adj      0.9668      0.707      1.367      0.172      -0.420       2.354
+const         13.7475      1.786      7.698      0.000      10.246      17.249
+sp_stuff      -0.1552      0.016     -9.448      0.000      -0.187      -0.123
+gain_mix       0.1061      0.051      2.076      0.038       0.006       0.206
+gain_gap       0.3187      0.061      5.233      0.000       0.199       0.438
+coors_adj      0.9803      0.707      1.387      0.166      -0.406       2.367
 ==============================================================================
 q             0       1       2       3       4
 n        534.00  533.00  533.00  533.00  534.00
-comb       0.09    0.46    0.85    1.38    2.39
-d_stuff   -3.24   -2.20   -1.01   -0.10    1.85
-resid     -0.36   -0.44   -0.16    0.01    0.94
+comb       0.09    0.46    0.86    1.39    2.43
+d_stuff   -3.34   -2.04   -1.17    0.11    1.73
+resid     -0.45   -0.28   -0.30    0.21    0.81
 
 as-of-2025:
        player_name  sp_stuff  gain_mix worst_fam  worst_use  worst_stf best_fam  best_use  best_stf  gain_gap                                      gap_parts  col_share  coors_adj  score  rank  stuff26   d26
-  Dollander, Chase     97.41      3.80        CH       0.08      89.11       FC      0.12    109.85      3.93                            FF 92→99 | SI 96→99       0.53       0.63   2.25  48.0   109.85 12.44
-  Hancock, Emerson     90.04      3.66        CH       0.20      87.08       SL      0.14    105.39      5.19               FF 91→96 | SI 88→96 | SL 105→110        NaN       0.00   2.01  83.0   100.91 10.87
-Senzatela, Antonio     85.33      4.75        CH       0.08      79.63       SL      0.20    102.01      6.07             CU 102→111 | FF 78→86 | SL 102→105       0.54       0.09   2.49  34.0   103.25 17.92
- Palmquist, Carson     93.20      4.14        FC       0.13      82.67       SL      0.31    106.39      8.08 FC 83→93 | FF 87→101 | SI 103→107 | SL 106→108       0.51       0.50   3.45   7.0   107.28 14.08
-as-of-2025 top-40 by combined score: realized 2026 ΔStuff+ +1.18 vs stuff-matched +0.18 → excess +1.00 (n=28)
+  Dollander, Chase     97.41      3.80        CH       0.08      89.11       FC      0.12    109.85      2.44                            FF 92→97 | SI 96→98       0.53       0.63   1.80 110.0   109.85 12.44
+  Hancock, Emerson     90.04      3.66        CH       0.20      87.08       SL      0.14    105.39      5.19               FF 91→96 | SI 88→96 | SL 105→110        NaN       0.00   2.04  78.0   100.91 10.87
+Senzatela, Antonio     85.33      4.75        CH       0.08      79.63       SL      0.20    102.01      6.07             CU 102→111 | FF 78→86 | SL 102→105       0.54       0.09   2.52  35.0   103.25 17.92
+ Palmquist, Carson     93.20      4.14        FC       0.13      82.67       SL      0.31    106.39      8.12 FC 83→94 | FF 87→101 | SI 103→107 | SL 106→108       0.51       0.50   3.52   6.0   107.28 14.08
+as-of-2025 top-40 by combined score: realized 2026 ΔStuff+ +1.10 vs stuff-matched +0.21 → excess +0.90 (n=27)
         player_name  sp_stuff  gain_mix  gain_gap  coors_adj  score  stuff26   d26
-    Molina, Anthony     93.51      6.49      5.59       2.65   5.00   100.19  6.69
-    Márquez, Germán     85.58      5.84      8.65       0.64   3.94    87.23  1.66
-      Holman, Grant     91.66     -0.24     12.06       0.00   3.74      NaN   NaN
-     Blewett, Scott     85.04      0.86     11.64       0.00   3.73    90.71  5.67
-        Ureña, José     87.24      3.57      9.98       0.00   3.50      NaN   NaN
-   Sugano, Tomoyuki     87.76      4.56      9.62       0.00   3.49    81.56 -6.20
-  Palmquist, Carson     93.20      4.14      8.08       0.50   3.45   107.28 14.08
-Liberatore, Matthew     95.28      7.10      8.36       0.00   3.37    97.75  2.46
-         Lee, Chase     90.85      3.13      9.54       0.00   3.32    95.98  5.13
-        Jacob, Alek     89.94      2.35      9.45       0.00   3.20    86.32 -3.61
-     Vodnik, Victor     97.70      3.78      5.01       1.17   3.10   100.63  2.93
-        Mize, Casey     94.57      3.83      8.53       0.00   3.07    88.63 -5.95
-      Brown, McCade     90.94      3.43      3.57       1.62   3.04      NaN   NaN
-       Beeks, Jalen     91.95      4.30      8.15       0.00   3.01    88.73 -3.22
-     Heaney, Andrew     90.19      4.97      7.88       0.00   2.99      NaN   NaN
-        Agnos, Zach     88.53      2.98      5.70       0.89   2.96    90.30  1.77
-    Bautista, Félix     99.80      2.50      8.60       0.00   2.96      NaN   NaN
-    Walker, Taijuan     86.28      5.50      7.52       0.00   2.94    88.59  2.31
-  Saalfrank, Andrew     87.49      0.26      9.31       0.00   2.94      NaN   NaN
-      Littell, Zack     87.76      2.61      8.22       0.00   2.85    83.16 -4.60
+    Molina, Anthony     93.51      6.49      4.95       2.65   4.86   100.19  6.69
+     Blewett, Scott     85.04      0.86     11.64       0.00   3.80    90.71  5.67
+    Márquez, Germán     85.58      5.84      7.66       0.64   3.69    87.23  1.66
+      Holman, Grant     91.66     -0.24     11.23       0.00   3.55      NaN   NaN
+   Sugano, Tomoyuki     87.76      4.56      9.62       0.00   3.55    81.56 -6.20
+  Palmquist, Carson     93.20      4.14      8.12       0.50   3.52   107.28 14.08
+Liberatore, Matthew     95.28      7.10      8.36       0.00   3.42    97.75  2.46
+         Lee, Chase     90.85      3.13      9.54       0.00   3.37    95.98  5.13
+     Heaney, Andrew     90.19      4.97      8.62       0.00   3.28      NaN   NaN
+        Jacob, Alek     89.94      2.35      9.45       0.00   3.26    86.32 -3.61
+        Ureña, José     87.24      3.57      8.87       0.00   3.20      NaN   NaN
+     Vodnik, Victor     97.70      3.78      5.01       1.17   3.15   100.63  2.93
+        Mize, Casey     94.57      3.83      8.55       0.00   3.13    88.63 -5.95
+       Beeks, Jalen     91.95      4.30      8.15       0.00   3.05    88.73 -3.22
+        Agnos, Zach     88.53      2.98      5.83       0.89   3.04    90.30  1.77
+      Brown, McCade     90.94      3.43      3.43       1.62   3.04      NaN   NaN
+    Walker, Taijuan     86.28      5.50      7.60       0.00   3.01    88.59  2.31
+    Bautista, Félix     99.80      2.50      8.60       0.00   3.01      NaN   NaN
+  Saalfrank, Andrew     87.49      0.26      9.31       0.00   2.99      NaN   NaN
+       Fedde, Erick     88.51      5.00      7.39       0.00   2.88    89.66  1.15

@@ -137,3 +137,10 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 - Poulin (#3 as of 2025) was driven by a 38-pitch sinker graded 106 (→93 in 2026). Now grade* = (n·own + 80·comps)/(n+80)
   before mix, plus-pitch, regress (levers_v2.py, palmquist_model.py). CPM top-10 excess +2.9/+1.9; Palmquist #11 (dev alone #4);
   Way #29. Board v9.
+
+## Update (2026-08-18, night): sup/pro classifier fix (Mason Black)
+- Bug: arsenal/SSW "points" could outvote 4S efficiency (Black: eff .99 → lean supinator). Now efficiency is primary (≥.95 pronator,
+  <.90 supinator); secondary evidence only breaks ties in .90–.95; hybrid = .80–.90 + high raw spin + no strong supinator evidence.
+  Black → pronator; Hancock 2023–26: pronator → pronator → hybrid → supinator (matches Rosen). Class counts: 1179 P / 1570 S / 310 H.
+- Chain rerun (precedent neighborhoods use class). CPM as-of-2025 top-10 excess +3.9 Stuff+ / +4.9 Pit+; top-40 +2.8/+2.7.
+  Going into 2026: Hancock #1, Dollander #4, Palmquist #12. 2026: Mason Black #4, Way #38.

@@ -35,12 +35,16 @@ pro=(e>=0.95).astype(int)+(ps.axis_res>10).astype(int)+((ps.use_CH.fillna(0)+ps.
 sup=(e<0.90).astype(int)+(ps.axis_res<-10).astype(int)+(ps.si_dev.abs()>=15).astype(int)+((ps.sweep_cap==1)|(ps.use_FC.fillna(0)>=0.08)|(ps.use_CU.fillna(0)+ps.use_KC.fillna(0)>=0.08)).astype(int)
 ps['pro_pts']=pro; ps['sup_pts']=sup
 def cls(r):
+    """Primary = 4S spin-based active spin (Rosen: ≥.95 pronator, <.90 supinator). Secondary evidence (axis residual vs slot,
+    seam-shift sinker, sweeper capability, arsenal) only breaks ties in the .90–.95 band. Hybrid: .80–.90 with high raw spin."""
     if pd.isna(r.eff4): return 'unknown'
-    if r.eff4>=0.95 and r.pro_pts>=r.sup_pts: return 'pronator'
-    if r.eff4<0.90 and r.sup_pts>=r.pro_pts: return 'supinator'
-    if 0.80<=r.eff4<0.90 and (r.ff_spin or 0)>=2350: return 'hybrid'
-    if r.pro_pts>r.sup_pts: return 'lean_pronator'
-    if r.sup_pts>r.pro_pts: return 'lean_supinator'
+    if r.eff4>=0.95: return 'pronator'
+    if r.eff4<0.90:
+        if r.eff4>=0.80 and (r.ff_spin or 0)>=2350 and r.sup_pts<=1: return 'hybrid'
+        return 'supinator'
+    # ambiguous band .90–.95
+    if r.pro_pts>r.sup_pts or r.axis_res>5: return 'lean_pronator'
+    if r.sup_pts>r.pro_pts or r.axis_res<-5: return 'lean_supinator'
     return 'hybrid'
 ps['suppro_class']=ps.apply(cls,axis=1)
 ps.to_parquet('data/derived/suppro.parquet',index=False)
