@@ -70,3 +70,11 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 - Next-season (IP≥40, n=1783, IP-weighted r): ERA — Stuff+ −.39, Pit+ −.36, SIERA +.34, ERA +.19; xERA — Stuff+ −.53, Pit+ −.47;
   WAR/180 — Pit+ +.41, Stuff+ +.38. Location+ alone ≈ 0 forward. → the projection is a Stuff projection; Loc+ is second-order.
 - Value: SP next WAR/180 = −7.46 + 0.098·Pit+ (1 Pit+ ≈ .098 WAR/180); RP = −5.79 + 0.074·Pit+.
+
+## Update (2026-08-18, late): research corroboration + the one slot screen with support
+- `docs/RESEARCH-arm-angle-and-stuff-models.md`: independent Savant-leaderboard fits match our transfer slopes (SI +2.8"/10°,
+  axis 0.9°/°, no velo/BB% cost); FG Stuff+ construction (axis differential yes; VAA/arm angle no; per-type not re-centered;
+  reportedly rewritten as classification by 2025; predictiveness decaying since 2024); Tango's Stuff+→next-ERA r=.37 = our .371.
+- Driveline 2026 recipe replicated: ≥3° droppers with below-avg FF IVB and eff4≥.93 → ΔStuff+ +1.4 (n=54) vs −0.7…−1.0 elsewhere;
+  same profile without dropping −1.2; raisers no structure. Borderline p, independent corroboration → keep as a drop-direction
+  feasibility screen, not a projected gain.
