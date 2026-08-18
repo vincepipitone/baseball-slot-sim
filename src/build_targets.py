@@ -32,8 +32,11 @@ has_next=set(zip(d.pitcher+0,d.game_year-1))  # pitcher-seasons that exist next 
 valid_next=set(zip(d.pitcher,d.game_year-1))
 rows=[]
 for i,r in d.iterrows():
+    role_use={}
+    for g_ in FAM: role_use[ROLE[g_]]=role_use.get(ROLE[g_],0)+r[f'use_{g_}']
     for f in FAM:
         if r[f'use_{f}']>=0.02: continue
+        if role_use[ROLE[f]]>=0.05: continue   # role already occupied (CU vs KC, CH vs FS): not an addition
         key=(r.pitcher,r.game_year)
         label=np.nan
         if key in valid_next:
@@ -78,12 +81,26 @@ d['ip_assume']=np.where(d.role=='SP',np.clip(d.IP.fillna(0),60,200),np.clip(d.IP
 d['d_war']=np.where(d.role=='SP',WAR_SP,WAR_RP)*d.d_pit*d.ip_assume/180; d['d_dollars_M']=d.d_war*DPW
 d['ev_war']=np.where(d.role=='SP',WAR_SP,WAR_RP)*(B*d.ev)*d.ip_assume/180
 d.to_parquet(f'data/derived/target_cards{SUF}.parquet',index=False)
+d.to_parquet(f'data/derived/target_cards{SUF}.parquet',index=False)
 L[['pitcher','game_year','fam','prec','pstf','gain_raw','p_add','reach','gain','ev']].to_parquet(f'data/derived/target_fams{SUF}.parquet',index=False)
+# ---- levers v2 (mix, existing-pitch gap, Coors) + combined opportunity score
+lv=pd.read_parquet('data/derived/levers_v2.parquet')[['pitcher','game_year','gain_mix','worst_fam','worst_use','worst_stf','best_fam','best_use','best_stf','gain_gap','gap_parts','col_share','coors_adj']].drop_duplicates(['pitcher','game_year'])
+d=d.merge(lv,on=['pitcher','game_year'],how='left'); d[['gain_mix','gain_gap','coors_adj']]=d[['gain_mix','gain_gap','coors_adj']].fillna(0)
+import statsmodels.api as sm
+_nx=d[['pitcher','game_year','stuff']].copy(); _nx['game_year']-=1
+_b=d.merge(_nx,on=['pitcher','game_year'],suffixes=('','_next')).dropna(subset=['stuff_next'])
+_b=_b[_b.game_year<=ASOF-1]
+_f=sm.OLS(_b.stuff_next-_b.stuff,sm.add_constant(_b[['stuff','sum_ev','gain_mix','gain_gap','coors_adj']])).fit()
+print('combined-score weights (ΔStuff+ ~ level + levers, years<=%d):'%(ASOF-1)); print(_f.params.round(3).to_dict(), {k:round(v,3) for k,v in _f.pvalues.items()})
+W={k:max(_f.params[k],0) for k in ['sum_ev','gain_mix','gain_gap','coors_adj']}
+d['opportunity']=sum(W[k]*d[k] for k in W)
+d['proj_stuff_all']=d.stuff+d.opportunity
 # ---- backtest on years <=2025
 nx=d[['pitcher','game_year','stuff','sp_pitching','sp_location']].copy(); nx['game_year']-=1
 b=d.merge(nx,on=['pitcher','game_year'],suffixes=('','_next')); b['d_stuff']=b.stuff_next-b.stuff; b['d_pitp']=b.sp_pitching_next-b.sp_pitching
 b=b.dropna(subset=['d_stuff'])
 def r(a,c): k=np.isfinite(a)&np.isfinite(c); return np.corrcoef(a[k],c[k])[0,1]
+print(f"opportunity: r(opp, ΔStuff+) {r(b.opportunity,b.d_stuff):.3f} | after mean reversion {r(b.opportunity,sm.OLS(b.d_stuff,sm.add_constant(b.stuff)).fit().resid):.3f}")
 print(f"\nbacktest n={len(b)}: r(gain, ΔStuff+) {r(b.gain,b.d_stuff):.3f} | r(EV, ΔStuff+) {r(b.ev,b.d_stuff):.3f} | r(sum_EV, ΔStuff+) {r(b.sum_ev,b.d_stuff):.3f} | r(EV, ΔPit+) {r(b.ev,b.d_pitp):.3f} | r(stuff level, ΔStuff+) {r(b.stuff,b.d_stuff):.3f}")
 # controlling for mean reversion: residualize ΔStuff+ on stuff level
 import statsmodels.api as sm
@@ -94,7 +111,7 @@ b['q']=pd.qcut(b.sum_ev.rank(method='first'),5,labels=False); print(b.groupby('q
 c=d[(d.game_year==ASOF)].copy()
 cols=['PlayerName','Team','Age','role','IP','arm_angle','eff4','suppro_class','stuff','stuff_B_plus_oos','sp_location','sp_pitching','best_add','best_add_pstf','best_add_prec','best_add_padd','gain','sum_ev','n_reachable','npit0' if 'npit0' in c else 'n_precedent_pool','drop_recipe','proj_stuff','proj_pit','d_pit','d_war','d_dollars_M']
 cols=[x for x in cols if x in c.columns]
-top=c.sort_values('sum_ev',ascending=False)
+top=c.sort_values('opportunity',ascending=False)
 lines=[f"# {ASOF} target cards (as of end of {ASOF} data) — repertoire lever, precedent-valued\n",
 "Method: for each family the pitcher does not throw (<2%), precedent = same-hand, sup/pro-compatible pitchers within the trait neighborhood; "
 "reachable if ≥20% of them throw it ≥10%; gain = 0.14 usage × (precedent Stf+ − current Stuff+)+; P(add) from a grouped-CV binary model; "
@@ -115,3 +132,5 @@ for nm in ['Yesavage','Palmquist','Hancock']:
 open(f'docs/targets_{ASOF}.md','w').write('\n'.join(lines))
 print('\nwrote docs/targets_2026.md; 2026 pitchers:',len(c))
 print(c.sort_values('sum_ev',ascending=False)[['PlayerName','Team','role','stuff','best_add','best_add_pstf','best_add_padd','gain','sum_ev','d_war']].head(15).round(2).to_string(index=False))
+
+d.to_parquet(f'data/derived/target_cards{SUF}.parquet',index=False)

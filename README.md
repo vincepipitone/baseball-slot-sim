@@ -94,3 +94,16 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   Palmquist not findable (rank 309, no reachable add — his gain was a running-FF→real-SI conversion, which the lever doesn't model);
   Dollander #2, Senzatela #7, Sasaki #36 on the list. `docs/targets_2025.md`.
 - `src/render_targets_html.py` → `docs/targets_2026.html`: sortable/filterable board with per-row family detail.
+
+## Update (2026-08-18, late): levers that find Palmquist (`src/levers_v2.py`, folded into `build_targets.py`)
+- Decomposition of Palmquist's +14: mostly USAGE reallocation (threw his 86 four-seam 42%; his 2025 grades at his 2026 mix ≈ 101)
+  plus existing-pitch quality gap vs comps (FF 86 vs comps 101; FC 75 vs 93) plus Coors.
+- New levers: (A) mix optimization (≤20 pts of usage toward better pitches; FB ≥30%, cap 45%); (B) existing-pitch gap =
+  usage × (comps' Stf+ on same family − own)⁺ over pitches thrown ≥8%; (C) Coors = own-model road-minus-all for ≥25%-at-COL
+  seasons (own model: home 96.2 vs road 98.3, ~2 pts suppressed).
+- Regression of next-season ΔStuff+ on level + levers (2020–25, n≈2270): existing-pitch gap .31 (t=5.9), addition EV 1.9 (p=.10),
+  mix .06 (p=.2), Coors .14 (n.s.). Combined "opportunity" score = weighted sum; r=.31 raw / .10 after mean reversion.
+- As-of-2025 (strict): opportunity top-40 gained +3.1 in 2026 vs −0.2 stuff-matched (excess +3.25, n=20; top-80 +1.4).
+  Palmquist #29, Dollander #18, Senzatela #20, Hancock #105. Caveat: survivorship among ranked relievers without 2026 samples.
+- Additions are now ROLE-level (CU/KC one role, CH/FS one role): no "add a curve when he throws a knuckle-curve" rows.
+- Board: `docs/targets_2026.html` (default sort = opportunity; row detail shows all four levers).
