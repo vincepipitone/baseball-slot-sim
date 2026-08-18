@@ -62,3 +62,11 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 - Verdict: slot changes average ~0 either direction and neither rotation nor precedent-at-slot identifies winners ex ante.
   What is predictable is downstream of the shape (Δ r ≈ .6 given the realized arsenal). The slot lever is therefore a
   repertoire question (addition classifier + precedent quality), not a geometry question.
+
+## Update (2026-08-18, night): Location+ cost, Pitching+ mapping, value map (`src/fit_value_map.py`, `src/pull_fangraphs_std.py`)
+- ΔLoc+ next season: all pairs −0.3 | slot changers ≥5° +0.6 (≥8° +1.8; flatter +0.9, steeper +0.1) | adders 0.0. Regression on
+  changers: ΔLoc+ = −0.31 + 0.00·|Δslot| − 0.50·(Loc+−100) → no command cost from slot change, only mean reversion (survivorship caveat).
+- Pitching+ ≈ −74.8 + 0.850·Stuff+ + 0.897·Location+, R² .945 (n=3749).
+- Next-season (IP≥40, n=1783, IP-weighted r): ERA — Stuff+ −.39, Pit+ −.36, SIERA +.34, ERA +.19; xERA — Stuff+ −.53, Pit+ −.47;
+  WAR/180 — Pit+ +.41, Stuff+ +.38. Location+ alone ≈ 0 forward. → the projection is a Stuff projection; Loc+ is second-order.
+- Value: SP next WAR/180 = −7.46 + 0.098·Pit+ (1 Pit+ ≈ .098 WAR/180); RP = −5.79 + 0.074·Pit+.
