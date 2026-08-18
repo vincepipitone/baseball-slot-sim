@@ -3,7 +3,7 @@ warnings.filterwarnings('ignore')
 exec(open('src/palmquist_model.py').read().split("F=['stuff'")[0])   # loads data + structural()
 d5=structural(tc5[tc5.n_tot>=300]); d6=structural(tc[(tc.n_tot>=300)&(tc.game_year==2026)])
 # Stuff-based plus-pitch features (best pitch by Stf+, n>=40)
-def plus_feats(base):
+def plus_feats(base):   # t already shrunk in palmquist_model.py prefix
     rows=[]
     for (pid,yr),g in t[t.pitcher.isin(base.pitcher)].groupby(['pitcher','game_year']):
         g=g[g.n>=40]

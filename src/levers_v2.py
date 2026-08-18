@@ -12,6 +12,14 @@ FAM=['FF','SI','FC','FS','SL','CU','KC','CH']
 t=pd.read_parquet('data/derived/emulator_table.parquet'); t=t[(t.n>=30)&t.stf.notna()]
 pr=pd.read_parquet('data/derived/precedent.parquet').drop_duplicates(['pitcher','game_year'])
 fg=pd.read_csv('data/derived/fg_stuff.csv').drop_duplicates(['pitcher','game_year'])[['pitcher','game_year','sp_stuff','sp_location','sp_pitching']]
+# ---- shrink per-pitch grades toward comps' grade by sample size (FG: per-pitch Stuff+ stabilizes ~80 pitches):
+#      grade* = (n*own + K*comps)/(n+K), K=80; comps' grade from gap_decomp (same neighborhood as regress-to-comps); fallback = own.
+K_SHRINK=80
+_gd=pd.read_parquet('data/derived/gap_decomp.parquet')[['pitcher','game_year','fg_type','c_stf']].drop_duplicates(['pitcher','game_year','fg_type'])
+t=t.merge(_gd,on=['pitcher','game_year','fg_type'],how='left')
+for _c in ['stf','pit']:
+    prior=t.c_stf if _c=='stf' else t.c_stf-(t.stf-t.pit)   # for pit, keep the pitcher's own stf→pit offset around the comps prior
+    prior=prior.fillna(t[_c]); t[_c+'_raw']=t[_c]; t[_c]=(t.n*t[_c]+K_SHRINK*prior)/(t.n+K_SHRINK)
 # ---- (A) mix optimization on per-pitch PITCHING+ (owner: optimize on Pit+), after CLUSTER-BASED identity:
 #      merge labels within a pitcher-season that are the same pitch (same role, |Δvelo|<2.5 mph, movement distance<4.5"):
 #      merged usage = sum, grades = usage-weighted. Kills CU/KC, CH/FS, FF/SI label splits of one physical pitch.

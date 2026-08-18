@@ -132,3 +132,8 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
   from structural features; strict 2025→26 test top-10 +3.9 (gated; Palmquist #3, Dollander #2), +7.9 ungated (Palmquist #7).
   Engine B (reconfiguration) = Actionable. Combined z-sum: Palmquist #7 of 165 going into 2026; Way #13 of 176 in 2026.
 - ΔPit+ target rejected (Loc+ mean reversion dominates; Bummer #1). Scripts: palmquist_model.py, palmquist_model_variants.py.
+
+## Update (2026-08-18, night): sample-size shrinkage of per-pitch grades
+- Poulin (#3 as of 2025) was driven by a 38-pitch sinker graded 106 (→93 in 2026). Now grade* = (n·own + 80·comps)/(n+80)
+  before mix, plus-pitch, regress (levers_v2.py, palmquist_model.py). CPM top-10 excess +2.9/+1.9; Palmquist #11 (dev alone #4);
+  Way #29. Board v9.

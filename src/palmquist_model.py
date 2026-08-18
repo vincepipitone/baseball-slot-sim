@@ -10,6 +10,9 @@ FAM=['FF','SI','FC','FS','SL','CU','KC','CH']
 tc=pd.read_parquet('data/derived/target_cards.parquet')          # all years, precedent as-of-2026 pools (used for 2026 scoring)
 tc5=pd.read_parquet('data/derived/target_cards_asof2025.parquet') # strict pools ≤2025 (used for fitting/testing)
 t=pd.read_parquet('data/derived/emulator_table.parquet'); t=t[(t.n>=30)&t.stf.notna()]
+_gd=pd.read_parquet('data/derived/gap_decomp.parquet')[['pitcher','game_year','fg_type','c_stf']].drop_duplicates(['pitcher','game_year','fg_type'])
+t=t.merge(_gd,on=['pitcher','game_year','fg_type'],how='left'); K_SHRINK=80
+t['stf']=(t.n*t.stf+K_SHRINK*t.c_stf.fillna(t.stf))/(t.n+K_SHRINK); t['pit']=t.pit.where(t.pit.isna(),(t.n*t.pit+K_SHRINK*(t.c_stf.fillna(t.stf)-(t.stf-t.pit.fillna(t.stf))))/(t.n+K_SHRINK))
 fg=pd.read_csv('data/derived/fg_stuff.csv').drop_duplicates(['pitcher','game_year'])[['pitcher','game_year','sp_stuff','sp_pitching','sp_location']]
 gs=pd.read_parquet('data/derived/gap_decomp.parquet')
 def structural(base):

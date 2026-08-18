@@ -1,5 +1,8 @@
 # The Carson Palmquist Model — spec and evidence (2026-08-18)
 
+**Update (later 8/18):** per-pitch grades are now shrunk toward comps' grade by sample size (grade* = (n·own + 80·comps)/(n+80); 80 = FG's Stuff+ stabilization) before mix / plus-pitch / regress. Reason: PJ Poulin ranked #3 going into 2026 on a 38-pitch sinker graded 106 that fell to 93 with usage. After shrinkage: Poulin out of gate; CPM as-of-2025 top-10 excess +2.9 Stuff+ / +1.9 Pit+ (was +2.2/+1.0); Dollander #1, Molina #2, Hancock #4, **Palmquist #11 of 158** (development engine alone #4); **Way #29 of 177** in 2026 (44-pitch slider 128 → ~111). Tables below are the pre-shrinkage run; live numbers are on the board and in data/derived/cpm_*.parquet.
+
+
 **Archetype gate (the thesis):** owns a plus pitch (any offering Stf+ ≥ 105) inside an ordinary arsenal (overall Stuff+ 88–104).
 Palmquist 2025 (sweeper 107 / Stuff+ 93) and Beck Way 2026 (slider 128 / 99) qualify; Yesavage, Glasnow do not.
 
