@@ -7,9 +7,10 @@ Also computes ARSENAL OPTIONALITY per pitcher-season."""
 import numpy as np, pandas as pd, sys
 from sklearn.neighbors import NearestNeighbors
 K=int(sys.argv[1]) if len(sys.argv)>1 else 40
+import os; ASOF=int(os.environ.get('ASOF','2026')); SUF='' if ASOF==2026 else f'_asof{ASOF}'
 FAM=['FF','SI','FC','FS','SL','CU','KC','CH']
 t=pd.read_parquet('data/derived/emulator_table.parquet')
-t=t[t.n>0]
+t=t[(t.n>0)&(t.game_year<=ASOF)]
 # pitcher-season trait vector from primary fastball rows
 fb=t[t.is_primary_fb==1].copy()
 fb['bauer_fb']=fb.release_spin_rate/fb.release_speed
@@ -65,7 +66,7 @@ for i in range(len(out)):
     m=(tr.p_throws.values==tr.p_throws.values[i])&(np.abs(tr.arm_angle.values-tr.arm_angle.values[i])<=5)&(np.abs(X.fb_havaa.values-X.fb_havaa.values[i])<=0.5)&(tr.pitcher.values!=tr.pitcher.values[i])
     thin[i]=m.sum()
 out['n_precedent_pool']=thin
-out.to_parquet('data/derived/precedent.parquet',index=False)
+out.to_parquet(f'data/derived/precedent{SUF}.parquet',index=False)
 # ---- backtest on additions
 ad=pd.read_csv('data/derived/pitch_additions.csv')
 m=ad.merge(out,on=['pitcher','game_year'],how='inner',suffixes=('','_p'))

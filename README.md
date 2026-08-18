@@ -86,3 +86,11 @@ Slot-conditional arsenal simulator for MLB FA/trade targeting. Design doc (sourc
 - Valuation: Pit+ = −74.8 + .85·Stf+ + .90·Loc+; ΔPit+ = .85·gain; ΔWAR = .098 (SP)/.074 (RP) per Pit+ per 180 IP; $8M/WAR.
 - Backtest (n=2315): possible-gain vs next-season ΔStuff+ r=.22 raw, ≈.04 after mean reversion → cards are reachability +
   conditional value, not forecasts. Yesavage: +0.5 max, P .02 → no lever. Palmquist/Hancock: nothing reachable → optimized.
+
+## Update (2026-08-18, late): prospective test + HTML board
+- `ASOF=2025 python3.11 src/precedent.py 40 && ASOF=2025 python3.11 src/build_targets.py` rebuilds the cards strictly as of end-2025
+  (precedent pools and P(add) labels ≤2025). Result: EV top-40 gained +2.7 Stuff+ in 2026 vs −0.1 for stuff-matched controls
+  (n=19); raw-gain top-40 +2.2. Hancock #1 by raw gain (mechanism wrong: card said curve; he dropped 8° + added sweeper/cutter);
+  Palmquist not findable (rank 309, no reachable add — his gain was a running-FF→real-SI conversion, which the lever doesn't model);
+  Dollander #2, Senzatela #7, Sasaki #36 on the list. `docs/targets_2025.md`.
+- `src/render_targets_html.py` → `docs/targets_2026.html`: sortable/filterable board with per-row family detail.
