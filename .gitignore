@@ -1,0 +1,5 @@
+data/raw/
+data/derived/*.parquet
+*.hyper
+*.twbx
+__pycache__/
